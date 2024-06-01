@@ -15,7 +15,12 @@ import {
 } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import { ClientOrderType } from "@/types/order";
-import { getUniques, getDefaultFilter, getColorForStatus } from "@/lib/utils";
+import {
+  getUniques,
+  getDefaultFilter,
+  getColorForStatus,
+  generateBarcodeDataUrl,
+} from "@/lib/utils";
 import { createCache, extractStyle, StyleProvider } from "@ant-design/cssinjs";
 import type Entity from "@ant-design/cssinjs/es/Cache";
 import { useServerInsertedHTML } from "next/navigation";
@@ -603,7 +608,7 @@ const OrderTable: React.FC<{
       {
         key: "print",
         text: "მონიშნული შეკვეთების დაპრინტვა",
-        onSelect: () => {
+        onSelect: async () => {
           if (selectedRowKeys.length == 0) {
             message.warning("შეკვეთები არჩეული არ გაქვთ");
             return;
@@ -617,6 +622,7 @@ const OrderTable: React.FC<{
             courier_fee: "საკურიერო",
             client_name: "კლიენტი",
             comment: "კომენტარი",
+            barcode: "ბარკოდი",
           };
 
           // Get the selected rows from the data using the selected keys
@@ -638,14 +644,30 @@ const OrderTable: React.FC<{
             [key: string]: string | number | null | boolean;
           }
           // Write table rows
-          selectedRows.forEach((record: ClientOrderType) => {
-            printWindow?.document.write("<tr style=`border: 1px solid black`>");
+          const barcodePromises = selectedRows.map(
+            (record: ClientOrderType) => {
+              const value = (record as NewClientOrderType)["barcode"] as string;
+              return generateBarcodeDataUrl(value);
+            }
+          );
+          const barcodes = await Promise.all(barcodePromises);
+
+          selectedRows.forEach((record: ClientOrderType, index) => {
+            printWindow?.document.write("<tr style='border: 1px solid black'>");
             Object.keys(columnNames).forEach((key) => {
-              printWindow?.document.write(
-                `<td style="text-align: center; border: 1px solid black">${
-                  (record as NewClientOrderType)[key]
-                }</td>`
-              );
+              if (key === "barcode") {
+                printWindow?.document.write(
+                  `<td style="text-align: center; border: 1px solid black"><img src="${
+                    barcodes[index]
+                  }" ${index == 1 && 'onload="window.print()'};" /></td>`
+                );
+              } else {
+                printWindow?.document.write(
+                  `<td style="text-align: center; border: 1px solid black">${
+                    (record as NewClientOrderType)[key]
+                  }</td>`
+                );
+              }
             });
             printWindow?.document.write("</tr>");
           });
@@ -654,7 +676,6 @@ const OrderTable: React.FC<{
 
           printWindow?.document.write("</body></html>");
           printWindow?.document.close();
-          printWindow?.print();
         },
       },
 

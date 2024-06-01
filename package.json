@@ -24,6 +24,7 @@
     "jsbarcode": "^3.11.6",
     "next": "14.0.3",
     "next-auth": "^4.24.5",
+    "next-barcode": "^1.5.0",
     "quagga": "^0.12.1",
     "query-string": "^8.1.0",
     "react": "^18",

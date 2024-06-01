@@ -1,6 +1,7 @@
 import { ClientOrderType } from "@/types/order";
 import { FilterValue } from "antd/es/table/interface";
 import { ClassValue, clsx } from "clsx";
+import JsBarcode from "jsbarcode";
 import queryString from "query-string";
 import { twMerge } from "tailwind-merge";
 
@@ -77,4 +78,18 @@ export function getStatusName(status: string) {
     case "BK":
       return "დაბრუნებულია";
   }
+}
+
+export async function generateBarcodeDataUrl(value: string): Promise<string> {
+  return new Promise((resolve) => {
+    const canvas = document.createElement("canvas");
+    JsBarcode(canvas, value, {
+      format: "CODE128",
+      lineColor: "#000",
+      width: 1,
+      height: 100,
+      displayValue: true,
+    });
+    resolve(canvas.toDataURL("image/png"));
+  });
 }

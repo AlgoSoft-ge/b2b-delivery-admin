@@ -21,6 +21,7 @@ interface ClientOrderType {
   order_position: number;
   status_approved: boolean;
   is_taken: boolean;
+  barcode?: string;
 }
 
 interface CommentProps {

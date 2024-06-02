@@ -83,3 +83,7 @@ select {
 .ant-select-selection-item {
   color: black !important;
 }
+
+.drawingBuffer {
+  display: none;
+}

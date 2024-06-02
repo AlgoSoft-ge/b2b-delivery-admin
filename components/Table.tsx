@@ -641,7 +641,7 @@ const OrderTable: React.FC<{
           printWindow?.document.write("</tr>");
 
           interface NewClientOrderType extends ClientOrderType {
-            [key: string]: string | number | null | boolean;
+            [key: string]: string | number | null | boolean | undefined;
           }
           // Write table rows
           const barcodePromises = selectedRows.map(

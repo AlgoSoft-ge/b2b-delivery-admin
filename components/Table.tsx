@@ -15,12 +15,7 @@ import {
 } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import { ClientOrderType } from "@/types/order";
-import {
-  getUniques,
-  getDefaultFilter,
-  getColorForStatus,
-  generateBarcodeDataUrl,
-} from "@/lib/utils";
+import { getUniques, getDefaultFilter, getColorForStatus } from "@/lib/utils";
 import { createCache, extractStyle, StyleProvider } from "@ant-design/cssinjs";
 import type Entity from "@ant-design/cssinjs/es/Cache";
 import { useServerInsertedHTML } from "next/navigation";
@@ -57,6 +52,7 @@ import Comment from "./Comment";
 import Row from "./Row";
 import { TableContext } from "@/context/tableContext";
 import SearchParamsType from "@/types/searchParams";
+import ColumnPrint from "./ColumnPrint";
 
 const OrderTable: React.FC<{
   data: ClientOrderType[];
@@ -74,6 +70,7 @@ const OrderTable: React.FC<{
   const [isAdd, setIsAdd] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isCouriers, setIsCouriers] = useState<boolean>(false);
+  const [isPrint, setIsPrint] = useState<boolean>(false);
   const [minPrice, setMinPrice] = useState<number | undefined>(
     searchParams["item_price"]
       ? Number(searchParams["item_price"].split("to")[0])
@@ -608,74 +605,12 @@ const OrderTable: React.FC<{
       {
         key: "print",
         text: "მონიშნული შეკვეთების დაპრინტვა",
-        onSelect: async () => {
-          if (selectedRowKeys.length == 0) {
+        onSelect: () => {
+          if (selectedRowKeys.length === 0) {
             message.warning("შეკვეთები არჩეული არ გაქვთ");
             return;
           }
-          const printWindow = window.open("", "_blank");
-          const columnNames = {
-            id: "კოდი",
-            address: "მისამართი",
-            phone_number: "ტელეფონი",
-            item_price: "შეკვეთის ფასი",
-            courier_fee: "საკურიერო",
-            client_name: "კლიენტი",
-            comment: "კომენტარი",
-            barcode: "ბარკოდი",
-          };
-
-          // Get the selected rows from the data using the selected keys
-          const selectedRows = orders.filter((row) =>
-            selectedRowKeys.includes(row.id)
-          );
-          printWindow?.document.write("<table style='width:100%'>");
-
-          // Write table headers
-          printWindow?.document.write("<tr style=`border: 1px solid black`>");
-          Object.values(columnNames).forEach((value) => {
-            printWindow?.document.write(
-              `<th style="border: 1px solid black">${value}</th>`
-            );
-          });
-          printWindow?.document.write("</tr>");
-
-          interface NewClientOrderType extends ClientOrderType {
-            [key: string]: string | number | null | boolean | undefined;
-          }
-          // Write table rows
-          const barcodePromises = selectedRows.map(
-            (record: ClientOrderType) => {
-              const value = (record as NewClientOrderType)["barcode"] as string;
-              return generateBarcodeDataUrl(value);
-            }
-          );
-          const barcodes = await Promise.all(barcodePromises);
-
-          selectedRows.forEach((record: ClientOrderType, index) => {
-            printWindow?.document.write("<tr style='border: 1px solid black'>");
-            Object.keys(columnNames).forEach((key) => {
-              if (key === "barcode") {
-                printWindow?.document.write(
-                  `<td style="text-align: center; border: 1px solid black"><img src="${
-                    barcodes[index]
-                  }" ${index == 1 && 'onload="window.print()'};" /></td>`
-                );
-              } else {
-                printWindow?.document.write(
-                  `<td style="text-align: center; border: 1px solid black">${
-                    (record as NewClientOrderType)[key]
-                  }</td>`
-                );
-              }
-            });
-            printWindow?.document.write("</tr>");
-          });
-
-          printWindow?.document.write("</table>");
-
-          printWindow?.document.write("</body></html>");
-          printWindow?.document.close();
+          setIsPrint(true);
         },
       },
 
@@ -1062,6 +997,19 @@ const OrderTable: React.FC<{
           centered
         >
           <DeleteModal setIsDelete={setIsDelete} handleDelete={handleDelete} />
+        </Modal>
+
+        <Modal
+          open={isPrint}
+          onOk={() => setIsDelete(isPrint)}
+          title="აირჩიეთ დასაპრინტი მონაცემები"
+          onCancel={() => setIsPrint(false)}
+          closeIcon={null}
+          footer={null}
+          width={350}
+          centered
+        >
+          <ColumnPrint selectedRowKeys={selectedRowKeys} orders={orders} />
         </Modal>
         <Modal
           open={isCouriers}

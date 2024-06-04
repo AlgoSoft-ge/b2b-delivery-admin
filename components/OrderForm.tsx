@@ -1,7 +1,7 @@
 import { getColorForStatus } from "@/lib/utils";
 import { ClientOrderType } from "@/types/order";
 import { ConfigProvider, Select } from "antd";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TableContext } from "@/context/tableContext";
 import { DeleteFilled } from "@ant-design/icons";
@@ -18,11 +18,11 @@ export default function OrderForm({
   order: ClientOrderType | null;
   onSubmit: (data: ClientOrderType) => void;
   setIsDelete?: (isDelete: boolean) => void;
-  barcode: string;
+  barcode?: string;
   mode: "edit" | "add";
 }) {
   const context = useContext(TableContext);
-
+  const [isBarcode, setIsBarcode] = useState(false);
   const {
     register,
     handleSubmit,
@@ -87,20 +87,28 @@ export default function OrderForm({
 
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
         <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
-          {barcode && mode === "add" && (
+          {mode == "add" && (
             <div className="sm:col-span-3">
               <label
                 htmlFor="first-name"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                ბარკოდი
+                <Checkbox onChange={(e) => setIsBarcode(e.target.checked)}>
+                  ბარკოდი
+                </Checkbox>
               </label>
               <div className="mt-2">
-                <input
-                  {...register("barcode", { required: true })}
-                  disabled
-                  className="block w-full outline-none  bg-gray-50 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
+                {isBarcode ? (
+                  <input
+                    {...register("barcode", { required: true })}
+                    placeholder="დაასკანერეთ ბარკოდი აქ"
+                    className="block w-full outline-none  bg-gray-50 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                ) : (
+                  <p className="text-gray-900 italic">
+                    ბარკოდი ავტომატურად დაგენერირდება
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -163,7 +171,11 @@ export default function OrderForm({
             </label>
             <div className="mt-2">
               <InputMask
-                mask={"\\9\\95 999 999 999"}
+                mask={
+                  mode == "edit" && order?.phone_number.charAt(0) == "5"
+                    ? "\\9\\95 599 999 999"
+                    : "\\9\\95 999 999 999"
+                }
                 maskChar={null}
                 {...register("phone_number", { required: true })}
                 className="block w-full  outline-none  bg-gray-50 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"

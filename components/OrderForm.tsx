@@ -1,7 +1,7 @@
 import { getColorForStatus } from "@/lib/utils";
 import { ClientOrderType } from "@/types/order";
 import { ConfigProvider, Select } from "antd";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TableContext } from "@/context/tableContext";
 import { DeleteFilled } from "@ant-design/icons";
@@ -14,45 +14,41 @@ export default function OrderForm({
   mode,
   setIsDelete,
   barcode,
+  isBarcode,
+  setIsBarcode,
 }: {
   order: ClientOrderType | null;
   onSubmit: (data: ClientOrderType) => void;
   setIsDelete?: (isDelete: boolean) => void;
   barcode?: string;
   mode: "edit" | "add";
+  setIsBarcode?: React.Dispatch<React.SetStateAction<boolean>>;
+  isBarcode?: boolean;
 }) {
   const context = useContext(TableContext);
-  const [isBarcode, setIsBarcode] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    watch,
-    control,
-    reset,
-    // formState: { errors },
-  } = useForm<ClientOrderType>({
-    defaultValues: {
-      status:
-        mode == "add"
-          ? "DF"
-          : context.user?.user_data.user_type == "courier"
-          ? order?.status_approved
-            ? order.status
-            : order?.staged_status
-          : order?.status,
-      address: order?.address,
-      city: order?.city,
-      comment: order?.comment,
-      courier_fee: order?.courier_fee,
-      item_price: order?.item_price,
-      phone_number: order?.phone_number,
-      addressee_full_name: order?.addressee_full_name,
-      client: order?.client,
-      courier: order?.courier,
-      is_taken: order?.is_taken,
-    },
-  });
-
+  const { register, handleSubmit, watch, control, reset } =
+    useForm<ClientOrderType>({
+      defaultValues: {
+        status:
+          mode == "add"
+            ? "DF"
+            : context.user?.user_data.user_type == "courier"
+            ? order?.status_approved
+              ? order.status
+              : order?.staged_status
+            : order?.status,
+        address: order?.address,
+        city: order?.city,
+        comment: order?.comment,
+        courier_fee: order?.courier_fee,
+        item_price: order?.item_price,
+        phone_number: order?.phone_number,
+        addressee_full_name: order?.addressee_full_name,
+        client: order?.client,
+        courier: order?.courier,
+        is_taken: order?.is_taken,
+      },
+    });
   useEffect(() => {
     reset({
       status:
@@ -93,14 +89,18 @@ export default function OrderForm({
                 htmlFor="first-name"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                <Checkbox onChange={(e) => setIsBarcode(e.target.checked)}>
+                <Checkbox
+                  onChange={(e) => {
+                    setIsBarcode && setIsBarcode(e.target.checked);
+                  }}
+                >
                   ბარკოდი
                 </Checkbox>
               </label>
               <div className="mt-2">
                 {isBarcode ? (
                   <input
-                    {...register("barcode", { required: true })}
+                    {...register("barcode", { required: isBarcode })}
                     placeholder="დაასკანერეთ ბარკოდი აქ"
                     className="block w-full outline-none  bg-gray-50 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />

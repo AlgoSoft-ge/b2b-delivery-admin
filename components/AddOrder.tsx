@@ -22,6 +22,7 @@ export default function AddOrder({
 }) {
   const [type, setType] = useState<"form" | "excel">("form");
   const [barcode, setBarcode] = useState("");
+  const [isBarcode, setIsBarcode] = useState(false);
 
   const onSubmit = async (data: ClientOrderType) => {
     const modifiedData = {
@@ -32,7 +33,7 @@ export default function AddOrder({
       phone_number: data.phone_number,
     };
 
-    !modifiedData.barcode && delete modifiedData.barcode;
+    !isBarcode && delete modifiedData.barcode;
 
     try {
       message.config({ maxCount: 1 });
@@ -114,6 +115,8 @@ export default function AddOrder({
           onSubmit={onSubmit}
           mode="add"
           barcode={barcode}
+          isBarcode={isBarcode}
+          setIsBarcode={setIsBarcode}
         />
       )}
       {type == "excel" && <ExcelForm token={user?.token} />}

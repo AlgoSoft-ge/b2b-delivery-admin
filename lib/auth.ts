@@ -20,7 +20,8 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         const res = await fetch(
-          `https://api.deliverow.ge/api/login/`,
+          `${process.env.API_URL}/login/`,
+
           {
             method: "POST",
             body: JSON.stringify({

@@ -1,7 +1,15 @@
 "use client";
 
-import React, { Fragment, useEffect, useState } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
+import React, {
+  Fragment,
+  useEffect,
+  useState,
+} from "react";
+import {
+  Disclosure,
+  Menu,
+  Transition,
+} from "@headlessui/react";
 import {
   Bars3Icon,
   BellIcon,
@@ -10,7 +18,11 @@ import {
   UserIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { cn, getColorForStatus, getStatusName } from "@/lib/utils";
+import {
+  cn,
+  getColorForStatus,
+  getStatusName,
+} from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { UserType } from "@/types/user";
 import { NotificationType } from "@/types/notificaition";
@@ -25,13 +37,27 @@ export default function Navigation({
 }) {
   const router = useRouter();
   const navigation = currentUser
-    ? [{ name: "გაგზავნილი შეკვეთები", href: "/orders" }]
+    ? [
+        {
+          name: "გაგზავნილი შეკვეთები",
+          href: "/orders",
+        },
+      ]
     : [];
-  if (currentUser?.user_data.user_type == "admin") {
-    navigation.push({ name: "სისტემის მომხმარებლები", href: "/users" });
+  if (
+    currentUser?.user_data.user_type == "admin"
+  ) {
+    navigation.push({
+      name: "სისტემის მომხმარებლები",
+      href: "/users",
+    });
   }
   const userNavigation = [
-    { name: "პროფილი", href: "/profile", listener: () => {} },
+    {
+      name: "პროფილი",
+      href: "/profile",
+      listener: () => {},
+    },
     {
       name: "სისტემიდან გასვლა",
       href: "",
@@ -43,7 +69,8 @@ export default function Navigation({
 
   const pathName = usePathname();
 
-  const [notifications, setNotifications] = useState<NotificationType[]>([]);
+  const [notifications, setNotifications] =
+    useState<NotificationType[]>([]);
 
   useEffect(() => {
     setNotifications(notificationsData);
@@ -52,7 +79,8 @@ export default function Navigation({
   const notificationsToShow = notifications
     ?.filter(
       (notification) =>
-        notification.notification_type == "status_updated" &&
+        notification.notification_type ==
+          "status_updated" &&
         notification.is_read == false
     )
     .map((notification) => {
@@ -62,14 +90,19 @@ export default function Navigation({
           className="flex justify-between px-4 py-2  gap-2  text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition-colors duration-200 ease-in-out border-b-2 border-gray-100"
         >
           <span className="font-semibold">
-            შეიცვალა შეკვეთის (კოდით {notification.order}) სტატუსი:{" "}
+            შეიცვალა შეკვეთის (კოდით{" "}
+            {notification.order}) სტატუსი:{" "}
             <span
               className="font-bold"
               style={{
-                color: getColorForStatus(notification.new_status),
+                color: getColorForStatus(
+                  notification.new_status
+                ),
               }}
             >
-              {getStatusName(notification.new_status)}
+              {getStatusName(
+                notification.new_status
+              )}
             </span>
           </span>
           <div className="flex flex-col md:flex-row gap-1">
@@ -100,14 +133,26 @@ export default function Navigation({
                       },
                     }
                   );
-                  if (response.ok && response2.ok) {
-                    message.success("სტატუსი დადასტურებულია");
-                    const newNotifications = notifications.filter(
-                      (item) => item.id != notification.id
+                  if (
+                    response.ok &&
+                    response2.ok
+                  ) {
+                    message.success(
+                      "სტატუსი დადასტურებულია"
                     );
-                    setNotifications(newNotifications);
+                    const newNotifications =
+                      notifications.filter(
+                        (item) =>
+                          item.id !=
+                          notification.id
+                      );
+                    setNotifications(
+                      newNotifications
+                    );
                   } else {
-                    message.error("დაფიქსირდა შეცდომა");
+                    message.error(
+                      "დაფიქსირდა შეცდომა"
+                    );
                   }
                 } catch (err) {
                   console.error(err);
@@ -143,14 +188,26 @@ export default function Navigation({
                     }
                   );
 
-                  if (response.ok && response2.ok) {
-                    message.success("სტატუსი უარყოფილია");
-                    const newNotifications = notifications.filter(
-                      (item) => item.id != notification.id
+                  if (
+                    response.ok &&
+                    response2.ok
+                  ) {
+                    message.success(
+                      "სტატუსი უარყოფილია"
                     );
-                    setNotifications(newNotifications);
+                    const newNotifications =
+                      notifications.filter(
+                        (item) =>
+                          item.id !=
+                          notification.id
+                      );
+                    setNotifications(
+                      newNotifications
+                    );
                   } else {
-                    message.error("დაფიქსირდა შეცდომა");
+                    message.error(
+                      "დაფიქსირდა შეცდომა"
+                    );
                   }
                 } catch (err) {
                   console.error(err);
@@ -166,7 +223,10 @@ export default function Navigation({
 
   return (
     <>
-      <Disclosure as="nav" className="bg-white shadow">
+      <Disclosure
+        as="nav"
+        className="bg-white shadow"
+      >
         {({ open }) => (
           <>
             <div className="mx-auto max-w-8xl px-2 sm:px-6 lg:px-8">
@@ -175,53 +235,78 @@ export default function Navigation({
                   {/* Mobile menu button */}
                   <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                     <span className="absolute -inset-0.5" />
-                    <span className="sr-only">Open main menu</span>
+                    <span className="sr-only">
+                      Open main menu
+                    </span>
                     {open ? (
-                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                      <XMarkIcon
+                        className="block h-6 w-6"
+                        aria-hidden="true"
+                      />
                     ) : (
-                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                      <Bars3Icon
+                        className="block h-6 w-6"
+                        aria-hidden="true"
+                      />
                     )}
                   </Disclosure.Button>
                 </div>
                 <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                   <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    {navigation.map((item, index) => (
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          "inline-flex items-center border-indigo-500 px-1 pt-1 text-sm font-bold text-gray-600 tracking-wide",
-                          pathName == item.href ? "border-b-2" : ""
-                        )}
-                        key={index}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
+                    {navigation.map(
+                      (item, index) => (
+                        <Link
+                          href={item.href}
+                          className={cn(
+                            "inline-flex items-center border-indigo-500 px-1 pt-1 text-sm font-bold text-gray-600 tracking-wide",
+                            pathName == item.href
+                              ? "border-b-2"
+                              : ""
+                          )}
+                          key={index}
+                        >
+                          {item.name}
+                        </Link>
+                      )
+                    )}
                     {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                   </div>
                 </div>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                  <Menu as="div" className="relative ml-3">
-                    {currentUser?.user_data.user_type == "admin" && (
+                  <Menu
+                    as="div"
+                    className="relative ml-3"
+                  >
+                    {currentUser?.user_data
+                      .user_type == "admin" && (
                       <div>
                         <Menu.Button className="relative flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                           <span className="absolute -inset-1.5" />
-                          <span className="sr-only">Open notifications</span>
+                          <span className="sr-only">
+                            Open notifications
+                          </span>
 
-                          <BellIcon className="h-6 w-6" aria-hidden="true" />
+                          <BellIcon
+                            className="h-6 w-6"
+                            aria-hidden="true"
+                          />
                           {notifications?.filter(
                             (notification) =>
                               notification.notification_type ==
                                 "status_updated" &&
-                              notification.is_read == false
+                              notification.is_read ==
+                                false
                           ).length > 0 && (
                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
                               {
                                 notifications.filter(
-                                  (notification) =>
+                                  (
+                                    notification
+                                  ) =>
                                     notification.notification_type ==
                                       "status_updated" &&
-                                    notification.is_read == false
+                                    notification.is_read ==
+                                      false
                                 ).length
                               }
                             </span>
@@ -240,11 +325,13 @@ export default function Navigation({
                     >
                       <Menu.Items className="absolute w-[300px] md:w-[500px] right-[-70px] md:right-0 z-10 mt-2 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-h-[60vh] overflow-auto custom-scroll">
                         <ul>
-                          {notificationsToShow.length > 0 ? (
+                          {notificationsToShow?.length >
+                          0 ? (
                             notificationsToShow
                           ) : (
                             <li className="px-4 py-2 text-sm text-gray-700">
-                              შეტყობინებები არ არის
+                              შეტყობინებები არ
+                              არის
                             </li>
                           )}
                         </ul>
@@ -252,20 +339,33 @@ export default function Navigation({
                     </Transition>
                   </Menu>
                   {/* Profile dropdown */}
-                  <Menu as="div" className="relative ml-5 flex">
+                  <Menu
+                    as="div"
+                    className="relative ml-5 flex"
+                  >
                     <div>
                       <Menu.Button className="relative flex items-center text-[18px] mx-auto rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <span className="absolute -inset-1.5" />
-                        <span className="sr-only">Open user menu</span>
-                        {currentUser?.user_data.user_type == "client" ? (
+                        <span className="sr-only">
+                          Open user menu
+                        </span>
+                        {currentUser?.user_data
+                          .user_type ==
+                        "client" ? (
                           <BuildingOffice2Icon
                             className="h-6 w-6"
                             aria-hidden="true"
                           />
                         ) : (
-                          <UserIcon className="h-6 w-6" aria-hidden="true" />
+                          <UserIcon
+                            className="h-6 w-6"
+                            aria-hidden="true"
+                          />
                         )}
-                        {currentUser?.user_data.username}
+                        {
+                          currentUser?.user_data
+                            .username
+                        }
                       </Menu.Button>
                     </div>
                     <Transition
@@ -278,22 +378,30 @@ export default function Navigation({
                       leaveTo="transform opacity-0 scale-95"
                     >
                       <Menu.Items className="absolute right-0 z-10 mt-7 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {userNavigation.map((item, index) => (
-                          <Menu.Item key={index}>
-                            {({ active }) => (
-                              <a
-                                href={item.href}
-                                className={cn(
-                                  active ? "bg-gray-100" : "",
-                                  "block px-4 py-2 text-sm text-gray-700"
-                                )}
-                                onClick={item.listener}
-                              >
-                                {item.name}
-                              </a>
-                            )}
-                          </Menu.Item>
-                        ))}
+                        {userNavigation.map(
+                          (item, index) => (
+                            <Menu.Item
+                              key={index}
+                            >
+                              {({ active }) => (
+                                <a
+                                  href={item.href}
+                                  className={cn(
+                                    active
+                                      ? "bg-gray-100"
+                                      : "",
+                                    "block px-4 py-2 text-sm text-gray-700"
+                                  )}
+                                  onClick={
+                                    item.listener
+                                  }
+                                >
+                                  {item.name}
+                                </a>
+                              )}
+                            </Menu.Item>
+                          )
+                        )}
                       </Menu.Items>
                     </Transition>
                   </Menu>

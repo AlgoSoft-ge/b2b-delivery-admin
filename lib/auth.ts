@@ -9,18 +9,29 @@ const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        username: { label: "username", type: "text" },
-        password: { label: "password", type: "password" },
+        username: {
+          label: "username",
+          type: "text",
+        },
+        password: {
+          label: "password",
+          type: "password",
+        },
       },
       async authorize(credentials) {
-        const res = await fetch(`http://64.227.117.209:1337/api/login/`, {
-          method: "POST",
-          body: JSON.stringify({
-            username: credentials?.username,
-            password: credentials?.password,
-          }),
-          headers: { "Content-Type": "application/json" },
-        });
+        const res = await fetch(
+          `https://api.deliverow.ge/api/login/`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              username: credentials?.username,
+              password: credentials?.password,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         const user = await res.json();
 

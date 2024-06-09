@@ -4,6 +4,8 @@
 
 body {
   height: 100vh;
+  width: 100vw !important;
+  overflow-x: hidden;
 }
 
 input,
@@ -34,8 +36,9 @@ select {
 }
 
 .company-logo {
-  filter: invert(98%) sepia(21%) saturate(173%) hue-rotate(254deg)
-    brightness(115%) contrast(100%);
+  filter: invert(98%) sepia(21%) saturate(173%)
+    hue-rotate(254deg) brightness(115%)
+    contrast(100%);
 }
 
 /* #for-hide .ant-select-selection-item {
@@ -72,7 +75,9 @@ select {
   background: #555;
 }
 
-#table-select .ant-select .ant-select-selection-item {
+#table-select
+  .ant-select
+  .ant-select-selection-item {
   color: white !important;
 }
 
@@ -85,5 +90,9 @@ select {
 }
 
 .drawingBuffer {
+  display: none;
+}
+
+.ant-drawer-mask {
   display: none;
 }

@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+} from "react";
 import {
   Button,
   ConfigProvider,
@@ -12,11 +15,23 @@ import {
   DatePickerProps,
   message,
   Modal,
+  Drawer,
 } from "antd";
-import type { ColumnsType, TableProps } from "antd/es/table";
+import type {
+  ColumnsType,
+  TableProps,
+} from "antd/es/table";
 import { ClientOrderType } from "@/types/order";
-import { getUniques, getDefaultFilter, getColorForStatus } from "@/lib/utils";
-import { createCache, extractStyle, StyleProvider } from "@ant-design/cssinjs";
+import {
+  getUniques,
+  getDefaultFilter,
+  getColorForStatus,
+} from "@/lib/utils";
+import {
+  createCache,
+  extractStyle,
+  StyleProvider,
+} from "@ant-design/cssinjs";
 import type Entity from "@ant-design/cssinjs/es/Cache";
 import { useServerInsertedHTML } from "next/navigation";
 import queryString from "query-string";
@@ -27,10 +42,20 @@ import {
   TableRowSelection,
 } from "antd/es/table/interface";
 import { useRouter } from "next/navigation";
-import { EditFilled, PhoneFilled, MessageFilled } from "@ant-design/icons";
-import EditOrder, { DeleteModal } from "./EditOrder";
+import {
+  EditFilled,
+  PhoneFilled,
+  MessageFilled,
+  CloseOutlined,
+} from "@ant-design/icons";
+import EditOrder, {
+  DeleteModal,
+} from "./EditOrder";
 import { ClearOutlined } from "@ant-design/icons";
-import { UserInfoType, UserType } from "@/types/user";
+import {
+  UserInfoType,
+  UserType,
+} from "@/types/user";
 import { PlusIcon } from "@heroicons/react/20/solid";
 import AddOrder from "./AddOrder";
 import { RangePickerProps } from "antd/es/date-picker";
@@ -61,45 +86,91 @@ const OrderTable: React.FC<{
   user: UserType | undefined;
   couriers: UserInfoType[];
   clients: UserInfoType[];
-}> = ({ data, searchParams, user, filteredOrders, couriers, clients }) => {
+}> = ({
+  data,
+  searchParams,
+  user,
+  filteredOrders,
+  couriers,
+  clients,
+}) => {
   let storedQuery = null;
   const { RangePicker } = DatePicker;
 
-  const [orders, setOrders] = useState<ClientOrderType[]>(filteredOrders || []);
-  const [editInfo, setEditInfo] = useState<ClientOrderType>();
-  const [isAdd, setIsAdd] = useState<boolean>(false);
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [isCouriers, setIsCouriers] = useState<boolean>(false);
-  const [isPrint, setIsPrint] = useState<boolean>(false);
-  const [minPrice, setMinPrice] = useState<number | undefined>(
+  const [orders, setOrders] = useState<
+    ClientOrderType[]
+  >(filteredOrders || []);
+  const [editInfo, setEditInfo] =
+    useState<ClientOrderType>();
+  const [isAdd, setIsAdd] =
+    useState<boolean>(false);
+  const [isEdit, setIsEdit] =
+    useState<boolean>(false);
+  const [isCouriers, setIsCouriers] =
+    useState<boolean>(false);
+  const [isPrint, setIsPrint] =
+    useState<boolean>(false);
+  const [minPrice, setMinPrice] = useState<
+    number | undefined
+  >(
     searchParams["item_price"]
-      ? Number(searchParams["item_price"].split("to")[0])
+      ? Number(
+          searchParams["item_price"].split(
+            "to"
+          )[0]
+        )
       : undefined
   );
 
-  const [maxPrice, setMaxPrice] = useState<number | undefined>(
+  const [maxPrice, setMaxPrice] = useState<
+    number | undefined
+  >(
     searchParams["item_price"]
-      ? Number(searchParams["item_price"].split("to")[1])
+      ? Number(
+          searchParams["item_price"].split(
+            "to"
+          )[1]
+        )
       : undefined
   );
 
-  const [startDate, setStartDate] = useState<number | undefined>(
+  const [startDate, setStartDate] = useState<
+    number | undefined
+  >(
     searchParams["created_at"]
-      ? Number(searchParams["created_at"]?.split("to")[0])
+      ? Number(
+          searchParams["created_at"]?.split(
+            "to"
+          )[0]
+        )
       : undefined
   );
-  const [endDate, setEndDate] = useState<number | undefined>(
+  const [endDate, setEndDate] = useState<
+    number | undefined
+  >(
     searchParams["created_at"]
-      ? Number(searchParams["created_at"]?.split("to")[1])
+      ? Number(
+          searchParams["created_at"]?.split(
+            "to"
+          )[1]
+        )
       : undefined
   );
 
-  const [isDelete, setIsDelete] = useState<boolean>(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [isDelete, setIsDelete] =
+    useState<boolean>(false);
+  const [selectedRowKeys, setSelectedRowKeys] =
+    useState<React.Key[]>([]);
   const [filteredInfo, setFilteredInfo] =
-    useState<Record<string, FilterValue | null>>();
-  const [sortedInfo, setSortedInfo] = useState<SorterResult<ClientOrderType>>();
-  const [defaultCurrent, setDefaultCurrent] = useState(1);
+    useState<
+      Record<string, FilterValue | null>
+    >();
+  const [sortedInfo, setSortedInfo] =
+    useState<SorterResult<ClientOrderType>>();
+  const [defaultCurrent, setDefaultCurrent] =
+    useState(1);
+
+  const [isDrawer, setIsDrawer] = useState(false);
 
   const router = useRouter();
 
@@ -107,40 +178,79 @@ const OrderTable: React.FC<{
     storedQuery = localStorage.getItem("query");
     setFilteredInfo(
       window.localStorage.getItem("filters")
-        ? JSON.parse(window.localStorage.getItem("filters") || "")
+        ? JSON.parse(
+            window.localStorage.getItem(
+              "filters"
+            ) || ""
+          )
         : {}
     );
     setSortedInfo(
       window.localStorage.getItem("sorteds")
-        ? JSON.parse(window.localStorage.getItem("sorteds") || "")
+        ? JSON.parse(
+            window.localStorage.getItem(
+              "sorteds"
+            ) || ""
+          )
         : {}
     );
     if (storedQuery) {
       setDefaultCurrent(
         Number(
-          queryString.parse(storedQuery, { arrayFormat: "comma" })
-            .current as unknown
+          queryString.parse(storedQuery, {
+            arrayFormat: "comma",
+          }).current as unknown
         )
       );
     }
 
-    const modifiedQuery: SearchParamsType = queryString.parse(
-      storedQuery || "",
-      {
+    const modifiedQuery: SearchParamsType =
+      queryString.parse(storedQuery || "", {
         arrayFormat: "comma",
-      }
-    );
-    if (modifiedQuery["item_price"]?.split("to")[0])
-      setMinPrice(Number(modifiedQuery["item_price"]?.split("to")[0]));
+      });
+    if (
+      modifiedQuery["item_price"]?.split("to")[0]
+    )
+      setMinPrice(
+        Number(
+          modifiedQuery["item_price"]?.split(
+            "to"
+          )[0]
+        )
+      );
 
-    if (modifiedQuery["item_price"]?.split("to")[1])
-      setMaxPrice(Number(modifiedQuery["item_price"]?.split("to")[1]));
+    if (
+      modifiedQuery["item_price"]?.split("to")[1]
+    )
+      setMaxPrice(
+        Number(
+          modifiedQuery["item_price"]?.split(
+            "to"
+          )[1]
+        )
+      );
 
-    if (modifiedQuery["created_at"]?.split("to")[0])
-      setStartDate(Number(modifiedQuery["created_at"]?.split("to")[0]));
+    if (
+      modifiedQuery["created_at"]?.split("to")[0]
+    )
+      setStartDate(
+        Number(
+          modifiedQuery["created_at"]?.split(
+            "to"
+          )[0]
+        )
+      );
 
-    if (modifiedQuery["created_at"]?.split("to")[1])
-      setEndDate(Number(modifiedQuery["created_at"]?.split("to")[1]));
+    if (
+      modifiedQuery["created_at"]?.split("to")[1]
+    )
+      setEndDate(
+        Number(
+          modifiedQuery["created_at"]?.split(
+            "to"
+          )[1]
+        )
+      );
 
     if (!searchParams["current"]) {
       router.push("?current=1&pageSize=10");
@@ -155,8 +265,12 @@ const OrderTable: React.FC<{
   }, [searchParams]);
 
   //optimezed antd for nextjs
-  const cache = React.useMemo<Entity>(() => createCache(), []);
-  const isServerInserted = React.useRef<boolean>(false);
+  const cache = React.useMemo<Entity>(
+    () => createCache(),
+    []
+  );
+  const isServerInserted =
+    React.useRef<boolean>(false);
 
   useServerInsertedHTML(() => {
     // avoid duplicate css insert
@@ -167,7 +281,9 @@ const OrderTable: React.FC<{
     return (
       <style
         id="antd"
-        dangerouslySetInnerHTML={{ __html: extractStyle(cache, true) }}
+        dangerouslySetInnerHTML={{
+          __html: extractStyle(cache, true),
+        }}
       />
     );
   });
@@ -187,15 +303,24 @@ const OrderTable: React.FC<{
       dataIndex: "client",
       width: "110px",
       filters: [
-        ...getUniques([...data.filter((item) => item.client)], "client_name"),
+        ...getUniques(
+          [...data.filter((item) => item.client)],
+          "client_name"
+        ),
         { text: "კლიენტის გარეშე", value: "-1" },
       ],
-      render: (text: string, record: ClientOrderType) =>
+      render: (
+        text: string,
+        record: ClientOrderType
+      ) =>
         record.client_name || "კლიენტის გარეშე",
       filterSearch: true,
       filteredValue: filteredInfo?.client || null,
 
-      defaultFilteredValue: getDefaultFilter(storedQuery, "client"),
+      defaultFilteredValue: getDefaultFilter(
+        storedQuery,
+        "client"
+      ),
     },
     {
       title: "კურიერი",
@@ -203,17 +328,27 @@ const OrderTable: React.FC<{
 
       width: "110px",
       filters: [
-        ...(couriers?.map((item) => ({ text: item.name, value: item.id })) ||
-          []),
+        ...(couriers?.map((item) => ({
+          text: item.name,
+          value: item.id,
+        })) || []),
         { text: "კურიერის გარეშე", value: "-1" },
       ],
-      render: (text: string, record: ClientOrderType) =>
-        couriers?.find((item) => item.id == record.courier)?.name ||
-        "კურიერის გარეშე",
+      render: (
+        text: string,
+        record: ClientOrderType
+      ) =>
+        couriers?.find(
+          (item) => item.id == record.courier
+        )?.name || "კურიერის გარეშე",
       filterSearch: true,
-      filteredValue: filteredInfo?.courier || null,
+      filteredValue:
+        filteredInfo?.courier || null,
 
-      defaultFilteredValue: getDefaultFilter(storedQuery, "courier"),
+      defaultFilteredValue: getDefaultFilter(
+        storedQuery,
+        "courier"
+      ),
     },
     {
       title: "ქალაქი",
@@ -224,15 +359,22 @@ const OrderTable: React.FC<{
       filterSearch: true,
       filteredValue: filteredInfo?.city || null,
 
-      defaultFilteredValue: getDefaultFilter(storedQuery, "city"),
+      defaultFilteredValue: getDefaultFilter(
+        storedQuery,
+        "city"
+      ),
     },
     {
       title: "სახელი და გვარი",
       dataIndex: "addressee_full_name",
       width: "140px",
-      filters: getUniques(data, "addressee_full_name"),
+      filters: getUniques(
+        data,
+        "addressee_full_name"
+      ),
       filterSearch: true,
-      filteredValue: filteredInfo?.addressee_full_name || null,
+      filteredValue:
+        filteredInfo?.addressee_full_name || null,
       defaultFilteredValue: getDefaultFilter(
         storedQuery,
         "addressee_full_name"
@@ -243,8 +385,12 @@ const OrderTable: React.FC<{
       dataIndex: "address",
       filters: getUniques(data, "address"),
       filterSearch: true,
-      filteredValue: filteredInfo?.address || null,
-      defaultFilteredValue: getDefaultFilter(storedQuery, "address"),
+      filteredValue:
+        filteredInfo?.address || null,
+      defaultFilteredValue: getDefaultFilter(
+        storedQuery,
+        "address"
+      ),
       width: "140px",
     },
     {
@@ -256,8 +402,12 @@ const OrderTable: React.FC<{
             <details>
               <summary>{text}</summary>
               <div className="flex flex-col border-2 border-gray-200 p-1">
-                <a className="text-black" href={`tel:${text}`}>
-                  <PhoneFilled className="w-6 h-6" /> დარეკვა
+                <a
+                  className="text-black"
+                  href={`tel:${text}`}
+                >
+                  <PhoneFilled className="w-6 h-6" />{" "}
+                  დარეკვა
                 </a>
                 <a
                   className="text-black border-t-2 border-gray-200 pt-2"
@@ -275,8 +425,12 @@ const OrderTable: React.FC<{
 
       filters: getUniques(data, "phone_number"),
       filterSearch: true,
-      filteredValue: filteredInfo?.phone_number || null,
-      defaultFilteredValue: getDefaultFilter(storedQuery, "phone_number"),
+      filteredValue:
+        filteredInfo?.phone_number || null,
+      defaultFilteredValue: getDefaultFilter(
+        storedQuery,
+        "phone_number"
+      ),
       width: "140px",
     },
 
@@ -284,19 +438,27 @@ const OrderTable: React.FC<{
       title: "კომენტარი",
       dataIndex: "comment",
       width: "120px",
-      filteredValue: filteredInfo?.comment || null,
-      render: (text: string) => <Comment text={text} />,
+      filteredValue:
+        filteredInfo?.comment || null,
+      render: (text: string) => (
+        <Comment text={text} />
+      ),
     },
 
     {
       title: "სტატუსი",
       dataIndex:
-        user?.user_data.user_type == "courier" ? "staged_status" : "status",
+        user?.user_data.user_type == "courier"
+          ? "staged_status"
+          : "status",
       width: "150px",
       filters: [
         { text: "სტატუსის გარეშე", value: "DF" },
         { text: "ჩაბარებულია", value: "GR" },
-        { text: "ჩაბარების პროცესშია", value: "YL" },
+        {
+          text: "ჩაბარების პროცესშია",
+          value: "YL",
+        },
         { text: "ვერ ჩაბარდა", value: "RD" },
         { text: "დაბრუნებულია", value: "BK" },
       ],
@@ -311,17 +473,20 @@ const OrderTable: React.FC<{
             theme={{
               components: {
                 Select: {
-                  optionSelectedBg: getColorForStatus(
-                    user?.user_data.user_type == "courier"
-                      ? !record.status_approved
-                        ? record.staged_status
+                  optionSelectedBg:
+                    getColorForStatus(
+                      user?.user_data.user_type ==
+                        "courier"
+                        ? !record.status_approved
+                          ? record.staged_status
+                          : record.status
                         : record.status
-                      : record.status
-                  ),
+                    ),
 
                   optionSelectedColor: "white",
                   selectorBg: getColorForStatus(
-                    user?.user_data.user_type == "courier" &&
+                    user?.user_data.user_type ==
+                      "courier" &&
                       !record.status_approved
                       ? record.staged_status
                       : record.status
@@ -333,20 +498,41 @@ const OrderTable: React.FC<{
           >
             <Select
               value={
-                user?.user_data.user_type == "courier" &&
+                user?.user_data.user_type ==
+                  "courier" &&
                 !record.status_approved
                   ? record.staged_status
                   : record.status
               }
               className={`w-[120px]`}
               dropdownStyle={{ width: "190px" }}
-              onChange={(value) => handleStatusChange(record.id, value)}
+              onChange={(value) =>
+                handleStatusChange(
+                  record.id,
+                  value
+                )
+              }
               options={[
-                { label: "სტატუსის გარეშე", value: "DF" },
-                { label: "ჩაბარებულია", value: "GR" },
-                { label: "ჩაბარების პროცესშია", value: "YL" },
-                { label: "ვერ ჩაბარდა", value: "RD" },
-                { label: "დაბრუნებულია", value: "BK" },
+                {
+                  label: "სტატუსის გარეშე",
+                  value: "DF",
+                },
+                {
+                  label: "ჩაბარებულია",
+                  value: "GR",
+                },
+                {
+                  label: "ჩაბარების პროცესშია",
+                  value: "YL",
+                },
+                {
+                  label: "ვერ ჩაბარდა",
+                  value: "RD",
+                },
+                {
+                  label: "დაბრუნებულია",
+                  value: "BK",
+                },
               ]}
             />
           </ConfigProvider>
@@ -357,20 +543,35 @@ const OrderTable: React.FC<{
       title: "ფასი",
       dataIndex: "item_price",
       width: "110px",
-      sortOrder: sortedInfo?.field === "item_price" ? sortedInfo.order : null,
+      sortOrder:
+        sortedInfo?.field === "item_price"
+          ? sortedInfo.order
+          : null,
       sorter: true,
       defaultSortOrder:
         storedQuery &&
-        queryString.parse(storedQuery, { arrayFormat: "comma" }).field ===
-          "item_price"
-          ? (queryString.parse(storedQuery, { arrayFormat: "comma" })
-              .order as SortOrder)
+        queryString.parse(storedQuery, {
+          arrayFormat: "comma",
+        }).field === "item_price"
+          ? (queryString.parse(storedQuery, {
+              arrayFormat: "comma",
+            }).order as SortOrder)
           : undefined,
-      defaultFilteredValue: getDefaultFilter(storedQuery, "item_price"),
-      filteredValue: filteredInfo?.item_price || null,
-      filterDropdown: ({ setSelectedKeys, confirm }) => {
+      defaultFilteredValue: getDefaultFilter(
+        storedQuery,
+        "item_price"
+      ),
+      filteredValue:
+        filteredInfo?.item_price || null,
+      filterDropdown: ({
+        setSelectedKeys,
+        confirm,
+      }) => {
         return (
-          <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+          <div
+            style={{ padding: 8 }}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
             <Input
               placeholder={"დან"}
               value={minPrice}
@@ -379,10 +580,15 @@ const OrderTable: React.FC<{
                 if (e.target.value == "") {
                   setMinPrice(undefined);
                 } else {
-                  setMinPrice(Number(e.target.value));
+                  setMinPrice(
+                    Number(e.target.value)
+                  );
                 }
               }}
-              style={{ marginBottom: 8, display: "block" }}
+              style={{
+                marginBottom: 8,
+                display: "block",
+              }}
             />
             <Input
               placeholder={"მდე"}
@@ -392,10 +598,15 @@ const OrderTable: React.FC<{
                 if (e.target.value == "") {
                   setMaxPrice(undefined);
                 } else {
-                  setMaxPrice(Number(e.target.value));
+                  setMaxPrice(
+                    Number(e.target.value)
+                  );
                 }
               }}
-              style={{ marginBottom: 8, display: "block" }}
+              style={{
+                marginBottom: 8,
+                display: "block",
+              }}
             />
             <Space>
               <Button
@@ -408,7 +619,10 @@ const OrderTable: React.FC<{
                 }}
                 size="small"
                 style={{ width: 90 }}
-                disabled={minPrice == undefined && maxPrice == undefined}
+                disabled={
+                  minPrice == undefined &&
+                  maxPrice == undefined
+                }
               >
                 Reset
               </Button>
@@ -416,7 +630,10 @@ const OrderTable: React.FC<{
                 type="primary"
                 onClick={() => {
                   if (minPrice && maxPrice) {
-                    setSelectedKeys([minPrice as number, maxPrice as number]);
+                    setSelectedKeys([
+                      minPrice as number,
+                      maxPrice as number,
+                    ]);
                   } else {
                     setSelectedKeys([]);
                   }
@@ -437,54 +654,81 @@ const OrderTable: React.FC<{
       title: "საკურიერო",
       dataIndex: "courier_fee",
       sorter: true,
-      filteredValue: filteredInfo?.courier_fee || null,
+      filteredValue:
+        filteredInfo?.courier_fee || null,
       width: "150px",
-      sortOrder: sortedInfo?.field === "courier_fee" ? sortedInfo.order : null,
+      sortOrder:
+        sortedInfo?.field === "courier_fee"
+          ? sortedInfo.order
+          : null,
       defaultSortOrder:
         storedQuery &&
-        queryString.parse(storedQuery, { arrayFormat: "comma" }).field ===
-          "courier_fee"
-          ? (queryString.parse(storedQuery, { arrayFormat: "comma" })
-              .order as SortOrder)
+        queryString.parse(storedQuery, {
+          arrayFormat: "comma",
+        }).field === "courier_fee"
+          ? (queryString.parse(storedQuery, {
+              arrayFormat: "comma",
+            }).order as SortOrder)
           : undefined,
     },
     {
       title: "საწყობიდან გატანილია",
       dataIndex: "is_taken",
-      filteredValue: filteredInfo?.is_taken || null,
+      filteredValue:
+        filteredInfo?.is_taken || null,
       filters: ["True", "False"].map((item) => ({
         text: item == "True" ? "კი" : "არა",
         value: item,
       })),
       width: "130px",
-      render: (text: boolean) => (text ? "კი" : "არა"),
+      render: (text: boolean) =>
+        text ? "კი" : "არა",
     },
 
     {
       title: "თარიღი",
       dataIndex: "created_at",
       sorter: (a, b) =>
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-      sortOrder: sortedInfo?.field === "created_at" ? sortedInfo.order : null,
+        new Date(a.created_at).getTime() -
+        new Date(b.created_at).getTime(),
+      sortOrder:
+        sortedInfo?.field === "created_at"
+          ? sortedInfo.order
+          : null,
       defaultSortOrder:
         storedQuery &&
-        queryString.parse(storedQuery, { arrayFormat: "comma" }).field ===
-          "created_at"
-          ? (queryString.parse(storedQuery, { arrayFormat: "comma" })
-              .order as SortOrder)
+        queryString.parse(storedQuery, {
+          arrayFormat: "comma",
+        }).field === "created_at"
+          ? (queryString.parse(storedQuery, {
+              arrayFormat: "comma",
+            }).order as SortOrder)
           : undefined,
-      filteredValue: filteredInfo?.created_at || null,
+      filteredValue:
+        filteredInfo?.created_at || null,
       width: "120px",
 
-      render: (text: string) => <>{text.split("T")[0].replaceAll("-", "/")}</>,
-      filterDropdown: ({ setSelectedKeys, confirm }) => (
+      render: (text: string) => (
+        <>
+          {text
+            .split("T")[0]
+            .replaceAll("-", "/")}
+        </>
+      ),
+      filterDropdown: ({
+        setSelectedKeys,
+        confirm,
+      }) => (
         <div className="flex flex-col  p-2">
           <RangePicker
             format="YYYY-MM-DD"
             onChange={onDateChange}
             defaultValue={
               startDate && endDate
-                ? [dayjs(startDate), dayjs(endDate)]
+                ? [
+                    dayjs(startDate),
+                    dayjs(endDate),
+                  ]
                 : undefined
             }
           />
@@ -494,7 +738,10 @@ const OrderTable: React.FC<{
             className="w-full mt-2 block"
             onClick={() => {
               if (startDate && endDate) {
-                setSelectedKeys([startDate as number, endDate as number]);
+                setSelectedKeys([
+                  startDate as number,
+                  endDate as number,
+                ]);
               } else {
                 setSelectedKeys([]);
               }
@@ -517,7 +764,9 @@ const OrderTable: React.FC<{
             localStorage.removeItem("query");
             localStorage.removeItem("filters");
             localStorage.removeItem("sorteds");
-            router.push("/orders?current=1&pageSize=10");
+            router.push(
+              "/orders?current=1&pageSize=10"
+            );
             setMinPrice(undefined);
             setMaxPrice(undefined);
             setFilteredInfo({});
@@ -526,7 +775,10 @@ const OrderTable: React.FC<{
         />
       ),
       dataIndex: "edit",
-      render: (_text: string, record: ClientOrderType) => (
+      render: (
+        _text: string,
+        record: ClientOrderType
+      ) => (
         <Button
           type="link"
           onClick={() => handleEditClick(record)}
@@ -549,90 +801,114 @@ const OrderTable: React.FC<{
     columns.splice(1, 2);
   }
 
-  const rowSelection: TableRowSelection<ClientOrderType> = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-    getCheckboxProps: (record: ClientOrderType) => ({
-      id: String(record.id),
-    }),
-    selections: [
-      {
-        key: "delete",
-        text: "მონიშნული შეკვეთების წაშლა",
-        onSelect: () => {
-          if (selectedRowKeys.length > 0) {
-            setIsDelete(true);
-          } else {
-            message.warning("შეკვეთები არჩეული არ გაქვთ");
-          }
+  const rowSelection: TableRowSelection<ClientOrderType> =
+    {
+      selectedRowKeys,
+      onChange: onSelectChange,
+      getCheckboxProps: (
+        record: ClientOrderType
+      ) => ({
+        id: String(record.id),
+      }),
+      selections: [
+        {
+          key: "delete",
+          text: "მონიშნული შეკვეთების წაშლა",
+          onSelect: () => {
+            if (selectedRowKeys.length > 0) {
+              setIsDelete(true);
+            } else {
+              message.warning(
+                "შეკვეთები არჩეული არ გაქვთ"
+              );
+            }
+          },
         },
-      },
 
-      {
-        key: "send",
-        text: "მონიშნული შეკვეთების ადრესატებისთვის მესიჯების გაგზავნა",
-        onSelect: async () => {
-          try {
-            if (selectedRowKeys.length == 0) {
-              message.warning("შეკვეთები არჩეული არ გაქვთ");
+        {
+          key: "send",
+          text: "მონიშნული შეკვეთების ადრესატებისთვის მესიჯების გაგზავნა",
+          onSelect: async () => {
+            try {
+              if (selectedRowKeys.length == 0) {
+                message.warning(
+                  "შეკვეთები არჩეული არ გაქვთ"
+                );
+                return;
+              }
+              message.config({ maxCount: 1 });
+              message.loading("დაელოდეთ...");
+              const response = await fetch(
+                `${process.env.API_URL}/orders/send_bulk_sms/`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+                    Authorization: `Token ${user?.token}`,
+                  },
+                  body: JSON.stringify({
+                    order_ids: selectedRowKeys,
+                  }),
+                }
+              );
+
+              if (response.ok) {
+                message.success(
+                  "მესიჯი წარმატებით გაიგზავნა"
+                );
+                setSelectedRowKeys([]);
+              } else {
+                message.error(
+                  "მესიჯის გაგზავნა ვერ მოხერხდა"
+                );
+              }
+            } catch (err) {
+              console.error(err);
+            }
+          },
+        },
+        {
+          key: "print",
+          text: "მონიშნული შეკვეთების დაპრინტვა",
+          onSelect: () => {
+            if (selectedRowKeys.length === 0) {
+              message.warning(
+                "შეკვეთები არჩეული არ გაქვთ"
+              );
               return;
             }
-            message.config({ maxCount: 1 });
-            message.loading("დაელოდეთ...");
-            const response = await fetch(
-              `${process.env.API_URL}/orders/send_bulk_sms/`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Token ${user?.token}`,
-                },
-                body: JSON.stringify({ order_ids: selectedRowKeys }),
-              }
-            );
-
-            if (response.ok) {
-              message.success("მესიჯი წარმატებით გაიგზავნა");
-              setSelectedRowKeys([]);
-            } else {
-              message.error("მესიჯის გაგზავნა ვერ მოხერხდა");
-            }
-          } catch (err) {
-            console.error(err);
-          }
+            setIsPrint(true);
+          },
         },
-      },
-      {
-        key: "print",
-        text: "მონიშნული შეკვეთების დაპრინტვა",
-        onSelect: () => {
-          if (selectedRowKeys.length === 0) {
-            message.warning("შეკვეთები არჩეული არ გაქვთ");
-            return;
-          }
-          setIsPrint(true);
-        },
-      },
 
-      {
-        key: "add_courier",
-        text: "მონიშნული შეკვეთების მიბმა კურიერისთვის",
-        onSelect: () => setIsCouriers(true),
-      },
-    ],
-  };
+        {
+          key: "add_courier",
+          text: "მონიშნული შეკვეთების მიბმა კურიერისთვის",
+          onSelect: () => setIsCouriers(true),
+        },
+      ],
+    };
 
   if (user?.user_data.user_type != "admin") {
     if (Array.isArray(rowSelection.selections)) {
       rowSelection.selections.splice(0, 1);
-      rowSelection.selections.splice(rowSelection.selections.length - 1, 1);
+      rowSelection.selections.splice(
+        rowSelection.selections.length - 1,
+        1
+      );
     }
   }
 
   //event handlers
-  const handleStatusChange = async (key: number, value: string) => {
+  const handleStatusChange = async (
+    key: number,
+    value: string
+  ) => {
     if (user?.user_data.user_type === "client") {
-      message.warning("სტატუსის შეცვლის უფლება არ გაქვთ");
+      message.warning(
+        "სტატუსის შეცვლის უფლება არ გაქვთ"
+      );
       return;
     }
     try {
@@ -658,9 +934,13 @@ const OrderTable: React.FC<{
         setOrders((prevOrders) =>
           prevOrders?.map((order) =>
             order.id === key
-              ? user?.user_data.user_type == "admin"
+              ? user?.user_data.user_type ==
+                "admin"
                 ? { ...order, status: value }
-                : { ...order, staged_status: value }
+                : {
+                    ...order,
+                    staged_status: value,
+                  }
               : order
           )
         );
@@ -670,113 +950,157 @@ const OrderTable: React.FC<{
     }
   };
 
-  const handleEditClick = (record: ClientOrderType) => {
+  const handleEditClick = (
+    record: ClientOrderType
+  ) => {
     setEditInfo(record);
     setIsEdit(true);
   };
 
-  const onChange: TableProps<ClientOrderType>["onChange"] = (
-    pagination,
-    filters,
-    sorter
-  ) => {
-    setDefaultCurrent(pagination.current as number);
-    setFilteredInfo(filters);
-    setSortedInfo(sorter as SorterResult<ClientOrderType>);
-    localStorage.setItem("filters", JSON.stringify(filters));
-    localStorage.setItem("sorteds", JSON.stringify(sorter));
-    const filteredSorter: Record<string, SortOrder | undefined> = {};
-    const filteredFilters: Record<string, (string | number | boolean)[]> = {};
-    // Filtering out null values from sorter
-    Object.keys(sorter).forEach((key) => {
-      if (sorter[key as keyof typeof sorter] !== null) {
-        filteredSorter[key] = sorter[key as keyof typeof sorter];
+  const onChange: TableProps<ClientOrderType>["onChange"] =
+    (pagination, filters, sorter) => {
+      setDefaultCurrent(
+        pagination.current as number
+      );
+      setFilteredInfo(filters);
+      setSortedInfo(
+        sorter as SorterResult<ClientOrderType>
+      );
+      localStorage.setItem(
+        "filters",
+        JSON.stringify(filters)
+      );
+      localStorage.setItem(
+        "sorteds",
+        JSON.stringify(sorter)
+      );
+      const filteredSorter: Record<
+        string,
+        SortOrder | undefined
+      > = {};
+      const filteredFilters: Record<
+        string,
+        (string | number | boolean)[]
+      > = {};
+      // Filtering out null values from sorter
+      Object.keys(sorter).forEach((key) => {
+        if (
+          sorter[key as keyof typeof sorter] !==
+          null
+        ) {
+          filteredSorter[key] =
+            sorter[key as keyof typeof sorter];
+        }
+      });
+      // Filtering out null values from filters
+      Object.keys(filters).forEach((key) => {
+        if (
+          filters[key as keyof typeof filters] !==
+          null
+        ) {
+          filteredFilters[key] = filters[
+            key as keyof typeof filters
+          ] as (string | number | boolean)[];
+        }
+      });
+      const query: SearchParamsType = {
+        ...pagination,
+        ...filteredSorter,
+        ...filteredFilters,
+      };
+      if (
+        Object.prototype.hasOwnProperty.call(
+          query,
+          "column"
+        )
+      ) {
+        delete query["column"];
       }
-    });
-    // Filtering out null values from filters
-    Object.keys(filters).forEach((key) => {
-      if (filters[key as keyof typeof filters] !== null) {
-        filteredFilters[key] = filters[key as keyof typeof filters] as (
-          | string
-          | number
-          | boolean
-        )[];
+      if (!query["order"]) {
+        delete query["field"];
       }
-    });
-    const query: SearchParamsType = {
-      ...pagination,
-      ...filteredSorter,
-      ...filteredFilters,
-    };
-    if (Object.prototype.hasOwnProperty.call(query, "column")) {
-      delete query["column"];
-    }
-    if (!query["order"]) {
-      delete query["field"];
-    }
-    if (query["item_price"]) {
-      if (query["item_price"].length == 2) {
-        query[
-          "item_price"
-        ] = `${query["item_price"][0]}to${query["item_price"][1]}`;
-      } else {
-        query["item_price"] = `${query["item_price"][0].split("to")[0]}to${
-          query["item_price"][0].split("to")[1]
-        }`;
+      if (query["item_price"]) {
+        if (query["item_price"].length == 2) {
+          query[
+            "item_price"
+          ] = `${query["item_price"][0]}to${query["item_price"][1]}`;
+        } else {
+          query["item_price"] = `${
+            query["item_price"][0].split("to")[0]
+          }to${
+            query["item_price"][0].split("to")[1]
+          }`;
+        }
       }
-    }
 
-    if (query["created_at"]) {
-      const startDate = new Date(query["created_at"][0]);
-      const formattedStartDate =
-        startDate.getFullYear() +
-        "-" +
-        ("0" + (startDate.getMonth() + 1)).slice(-2) +
-        "-" +
-        ("0" + startDate.getDate()).slice(-2);
-      const endDate = new Date(query["created_at"][1]);
-      const formattedEndDate =
-        endDate.getFullYear() +
-        "-" +
-        ("0" + (endDate.getMonth() + 1)).slice(-2) +
-        "-" +
-        ("0" + endDate.getDate()).slice(-2);
+      if (query["created_at"]) {
+        const startDate = new Date(
+          query["created_at"][0]
+        );
+        const formattedStartDate =
+          startDate.getFullYear() +
+          "-" +
+          (
+            "0" +
+            (startDate.getMonth() + 1)
+          ).slice(-2) +
+          "-" +
+          ("0" + startDate.getDate()).slice(-2);
+        const endDate = new Date(
+          query["created_at"][1]
+        );
+        const formattedEndDate =
+          endDate.getFullYear() +
+          "-" +
+          ("0" + (endDate.getMonth() + 1)).slice(
+            -2
+          ) +
+          "-" +
+          ("0" + endDate.getDate()).slice(-2);
 
-      if (query["created_at"].length == 2) {
-        query["created_at"] = `${formattedStartDate}to${formattedEndDate}`;
+        if (query["created_at"].length == 2) {
+          query[
+            "created_at"
+          ] = `${formattedStartDate}to${formattedEndDate}`;
+        }
       }
-    }
 
-    if (query["staged_status"]) {
-      query["status"] = query["staged_status"];
-      delete query["staged_status"];
-    }
+      if (query["staged_status"]) {
+        query["status"] = query["staged_status"];
+        delete query["staged_status"];
+      }
 
-    localStorage.setItem(
-      "query",
-      queryString.stringify(query, {
-        arrayFormat: "comma",
-      })
-    );
-    router.push(
-      "orders?" +
+      localStorage.setItem(
+        "query",
         queryString.stringify(query, {
           arrayFormat: "comma",
-        }),
+        })
+      );
+      router.push(
+        "orders?" +
+          queryString.stringify(query, {
+            arrayFormat: "comma",
+          }),
 
-      { shallow: true }
-    );
-  };
+        { shallow: true }
+      );
+    };
 
-  function onSelectChange(selectedRowIds: React.Key[]) {
+  function onSelectChange(
+    selectedRowIds: React.Key[]
+  ) {
     setSelectedRowKeys(selectedRowIds);
   }
 
   const onDateChange = (
-    value: DatePickerProps["value"] | RangePickerProps["value"],
+    value:
+      | DatePickerProps["value"]
+      | RangePickerProps["value"],
     dateString: [string, string] | string
   ) => {
-    setStartDate(new Date(dateString[0]).getTime());
+    setStartDate(
+      new Date(dateString[0]).getTime()
+    );
     setEndDate(new Date(dateString[1]).getTime());
   };
 
@@ -788,7 +1112,9 @@ const OrderTable: React.FC<{
         `${process.env.API_URL}/orders/delete-batch/`,
         {
           method: "DELETE",
-          body: JSON.stringify({ ids: selectedRowKeys }),
+          body: JSON.stringify({
+            ids: selectedRowKeys,
+          }),
           headers: {
             "Content-Type": "application/json",
             Authorization: `Token ${user?.token}`,
@@ -798,13 +1124,20 @@ const OrderTable: React.FC<{
 
       if (response.ok) {
         setOrders((prevOrders) =>
-          prevOrders.filter((order) => !selectedRowKeys.includes(order.id))
+          prevOrders.filter(
+            (order) =>
+              !selectedRowKeys.includes(order.id)
+          )
         );
         setSelectedRowKeys([]);
-        message.success("შეკვეთები წარმატებით წაიშალა");
+        message.success(
+          "შეკვეთები წარმატებით წაიშალა"
+        );
         setIsDelete(false);
       } else {
-        message.error("შეკვეთების წაშლა ვერ მოხერხდა");
+        message.error(
+          "შეკვეთების წაშლა ვერ მოხერხდა"
+        );
       }
     } catch (error) {
       console.error("Error:", error);
@@ -820,12 +1153,23 @@ const OrderTable: React.FC<{
     })
   );
 
-  const onDragEnd = ({ active, over }: DragEndEvent) => {
+  const onDragEnd = ({
+    active,
+    over,
+  }: DragEndEvent) => {
     if (active.id !== over?.id) {
       setOrders((prev) => {
-        const activeIndex = prev.findIndex((i) => i.id === active.id);
-        const overIndex = prev.findIndex((i) => i.id === over?.id);
-        return arrayMove(prev, activeIndex, overIndex);
+        const activeIndex = prev.findIndex(
+          (i) => i.id === active.id
+        );
+        const overIndex = prev.findIndex(
+          (i) => i.id === over?.id
+        );
+        return arrayMove(
+          prev,
+          activeIndex,
+          overIndex
+        );
       });
     }
   };
@@ -848,18 +1192,23 @@ const OrderTable: React.FC<{
             onChange={onChange}
             footer={() => (
               <div className="bg-red">
-                {user?.user_data.user_type != "courier" && (
+                {user?.user_data.user_type !=
+                  "courier" && (
                   <button
                     type="button"
                     className="rounded flex justify-center items-center bg-white w-full py-2 text-sm font-bold text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     onClick={() => setIsAdd(true)}
                   >
-                    დამატება <PlusIcon className="w-6 h-6" />
+                    დამატება{" "}
+                    <PlusIcon className="w-6 h-6" />
                   </button>
                 )}
               </div>
             )}
-            scroll={{ y: "65vh", x: 750 }}
+            scroll={{
+              y: "100% - 200px",
+              x: 750,
+            }}
             className="custom-scroll"
             components={{
               body: {
@@ -868,7 +1217,10 @@ const OrderTable: React.FC<{
             }}
             sticky={true}
             rowSelection={
-              user?.user_data.user_type != "client" ? rowSelection : undefined
+              user?.user_data.user_type !=
+              "client"
+                ? rowSelection
+                : undefined
             }
             rowKey={"id"}
             summary={(pageData) => {
@@ -878,67 +1230,103 @@ const OrderTable: React.FC<{
               if (selectedRowKeys.length) {
                 totalPrice = data.reduce(
                   (acc, current) =>
-                    selectedRowKeys.indexOf(current.id) !== -1
+                    selectedRowKeys.indexOf(
+                      current.id
+                    ) !== -1
                       ? acc + +current.item_price
                       : acc,
                   0
                 );
                 totalCourierFee = data.reduce(
                   (acc, current) =>
-                    selectedRowKeys.indexOf(current.id) !== -1
+                    selectedRowKeys.indexOf(
+                      current.id
+                    ) !== -1
                       ? acc + +current.courier_fee
                       : acc,
                   0
                 );
               } else {
-                pageData.forEach(({ item_price, courier_fee }) => {
-                  totalPrice += +item_price;
-                  totalCourierFee += +courier_fee;
-                  count++;
-                });
+                pageData.forEach(
+                  ({
+                    item_price,
+                    courier_fee,
+                  }) => {
+                    totalPrice += +item_price;
+                    totalCourierFee +=
+                      +courier_fee;
+                    count++;
+                  }
+                );
               }
 
               return (
-                <>
-                  <Table.Summary.Row className="absolute text-[15px] ">
-                    <Table.Summary.Cell index={1} className="font-bold">
-                      ჯამი
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={3}>
-                      <p>ფასი: {totalPrice.toFixed(2)} ₾</p>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={4}>
-                      <p>საკურიერო: {totalCourierFee.toFixed(2)} ₾</p>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={2} className="font-bold">
-                      საშუალო
-                    </Table.Summary.Cell>
+                <Drawer
+                  placement="bottom"
+                  open={isDrawer}
+                  onClose={() =>
+                    setIsDrawer(false)
+                  }
+                  height={"auto"}
+                  closeIcon={null}
+                >
+                  <CloseOutlined
+                    width={"20px"}
+                    height={"20px"}
+                    className="absolute  cursor-pointer"
+                    onClick={() =>
+                      setIsDrawer(false)
+                    }
+                  />
+                  <Table.Summary.Row className="flex flex-col items-end md:flex-row md:items-center md:justify-end w-[100%] bg-white z-[100] gap-4  text-[15px] pl-[20px] box-border">
                     <Table.Summary.Cell index={3}>
                       <p>
-                        ფასი:{" "}
+                        ჯამური ფასი:{" "}
+                        {totalPrice.toFixed(2)}₾
+                      </p>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={4}>
+                      <p>
+                        ჯამური საკურიერო:{" "}
+                        {totalCourierFee.toFixed(
+                          2
+                        )}
+                        ₾
+                      </p>
+                    </Table.Summary.Cell>
+
+                    <Table.Summary.Cell index={3}>
+                      <p>
+                        საშუალო ფასი:{" "}
                         {(
-                          totalPrice / (selectedRowKeys.length || count)
+                          totalPrice /
+                          (selectedRowKeys.length ||
+                            count)
                         ).toFixed(2)}
                         ₾
                       </p>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={4}>
                       <p>
-                        საკურიერო:{" "}
+                        საშუალო საკურიერო:{" "}
                         {(
-                          totalCourierFee / (selectedRowKeys.length || count)
-                        ).toFixed(2)}{" "}
+                          totalCourierFee /
+                          (selectedRowKeys.length ||
+                            count)
+                        ).toFixed(2)}
+                      </p>
+                    </Table.Summary.Cell>
+
+                    <Table.Summary.Cell index={4}>
+                      <p>
+                        რაოდენობა:
+                        {selectedRowKeys.length ||
+                          count}
                         ₾
                       </p>
                     </Table.Summary.Cell>
-                    <Table.Summary.Cell index={2} className="font-bold">
-                      რაოდენობა
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={3}>
-                      <p>{selectedRowKeys.length || count}</p>
-                    </Table.Summary.Cell>
                   </Table.Summary.Row>
-                </>
+                </Drawer>
               );
             }}
             pagination={{
@@ -949,8 +1337,26 @@ const OrderTable: React.FC<{
           />
         </SortableContext>
       </DndContext>
+      <Button
+        type="primary"
+        style={{
+          position: "fixed",
+          left: "10px",
+          bottom: "10px",
+        }}
+        onClick={() => setIsDrawer(true)}
+      >
+        ანალიტიკა
+      </Button>
       <TableContext.Provider
-        value={{ orders, setOrders, user, setIsEdit, couriers, clients }}
+        value={{
+          orders,
+          setOrders,
+          user,
+          setIsEdit,
+          couriers,
+          clients,
+        }}
       >
         {editInfo && isEdit && (
           <>
@@ -963,7 +1369,10 @@ const OrderTable: React.FC<{
               footer={null}
               width={900}
             >
-              <EditOrder order={editInfo} setIsEdit={setIsEdit} />
+              <EditOrder
+                order={editInfo}
+                setIsEdit={setIsEdit}
+              />
             </Modal>
           </>
         )}
@@ -996,7 +1405,10 @@ const OrderTable: React.FC<{
           width={300}
           centered
         >
-          <DeleteModal setIsDelete={setIsDelete} handleDelete={handleDelete} />
+          <DeleteModal
+            setIsDelete={setIsDelete}
+            handleDelete={handleDelete}
+          />
         </Modal>
 
         <Modal
@@ -1009,7 +1421,10 @@ const OrderTable: React.FC<{
           width={350}
           centered
         >
-          <ColumnPrint selectedRowKeys={selectedRowKeys} orders={orders} />
+          <ColumnPrint
+            selectedRowKeys={selectedRowKeys}
+            orders={orders}
+          />
         </Modal>
         <Modal
           open={isCouriers}
@@ -1034,7 +1449,8 @@ const OrderTable: React.FC<{
                   {
                     method: "POST",
                     headers: {
-                      "Content-Type": "application/json",
+                      "Content-Type":
+                        "application/json",
                       Authorization: `Token ${user?.token}`,
                     },
                     body: JSON.stringify({
@@ -1045,18 +1461,27 @@ const OrderTable: React.FC<{
                 );
 
                 if (response.ok) {
-                  message.success("შეკვეთები წარმატებით მიება კურიერს");
+                  message.success(
+                    "შეკვეთები წარმატებით მიება კურიერს"
+                  );
                   setOrders((prevOrders) =>
                     prevOrders.map((order) =>
-                      selectedRowKeys.includes(order.id)
-                        ? { ...order, courier: value }
+                      selectedRowKeys.includes(
+                        order.id
+                      )
+                        ? {
+                            ...order,
+                            courier: value,
+                          }
                         : order
                     )
                   );
                   setIsCouriers(false);
                   setSelectedRowKeys([]);
                 } else {
-                  message.error("შეკვეთების მიბმა ვერ მოხერხდა");
+                  message.error(
+                    "შეკვეთების მიბმა ვერ მოხერხდა"
+                  );
                 }
               } catch (error) {
                 console.error("Error:", error);

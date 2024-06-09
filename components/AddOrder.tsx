@@ -20,14 +20,21 @@ export default function AddOrder({
   orders: ClientOrderType[];
   setIsAdd: (isAdd: boolean) => void;
 }) {
-  const [type, setType] = useState<"form" | "excel">("form");
+  const [type, setType] = useState<
+    "form" | "excel"
+  >("form");
   const [barcode, setBarcode] = useState("");
-  const [isBarcode, setIsBarcode] = useState(false);
+  const [isBarcode, setIsBarcode] =
+    useState(false);
 
-  const onSubmit = async (data: ClientOrderType) => {
+  const onSubmit = async (
+    data: ClientOrderType
+  ) => {
     const modifiedData = {
       ...data,
-      sum: Number(data.item_price) + Number(data.courier_fee),
+      sum:
+        Number(data.item_price) +
+        Number(data.courier_fee),
       status: "DF",
       created_at: new Date().toISOString(),
       phone_number: data.phone_number,
@@ -38,22 +45,26 @@ export default function AddOrder({
     try {
       message.config({ maxCount: 1 });
       message.loading("დაელოდეთ...");
-      const response = await fetch(`${process.env.API_URL}/orders/`, {
-        method: "POST",
-        body: JSON.stringify(modifiedData),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${user?.token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.API_URL}/orders/`,
+        {
+          method: "POST",
+          body: JSON.stringify(modifiedData),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${user?.token}`,
+          },
+        }
+      );
       const newOrder = await response.json();
 
       if (response.ok) {
         setOrders([...orders, newOrder]);
-        message.success("შეკვეთა წარმატებით დაემატა");
+        message.success(
+          "შეკვეთა წარმატებით დაემატა"
+        );
         setIsAdd(false);
       } else {
-        console.log(newOrder);
         message.error(
           newOrder.barcode
             ? "შეკვეთა ამ ბარკოდით უკვე არსებობს"
@@ -71,7 +82,9 @@ export default function AddOrder({
           type="button"
           className={cn(
             "rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ",
-            type == "form" ? "bg-indigo-600 text-white" : ""
+            type == "form"
+              ? "bg-indigo-600 text-white"
+              : ""
           )}
           onClick={() => {
             setType("form"), setBarcode("");
@@ -83,7 +96,9 @@ export default function AddOrder({
           type="button"
           className={cn(
             "rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300",
-            type == "excel" ? "bg-indigo-600 text-white" : ""
+            type == "excel"
+              ? "bg-indigo-600 text-white"
+              : ""
           )}
           onClick={() => setType("excel")}
         >
@@ -119,7 +134,9 @@ export default function AddOrder({
           setIsBarcode={setIsBarcode}
         />
       )}
-      {type == "excel" && <ExcelForm token={user?.token} />}
+      {type == "excel" && (
+        <ExcelForm token={user?.token} />
+      )}
       {/* {type == "barcode" && (
         <Scanner setBarcode={setBarcode} setType={setType} />
       )} */}

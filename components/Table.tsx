@@ -1269,6 +1269,7 @@ const OrderTable: React.FC<{
                   }
                   height={"auto"}
                   closeIcon={null}
+                  getContainer=".mt-10"
                 >
                   <CloseOutlined
                     width={"20px"}
@@ -1343,6 +1344,7 @@ const OrderTable: React.FC<{
           position: "fixed",
           left: "10px",
           bottom: "10px",
+          backgroundColor: "",
         }}
         onClick={() => setIsDrawer(true)}
       >

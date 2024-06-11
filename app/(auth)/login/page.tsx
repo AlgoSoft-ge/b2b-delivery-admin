@@ -2,14 +2,17 @@
 
 import LoginForm from "@/components/LoginForm";
 import { useEffect } from "react";
-import { getSession, signOut } from "next-auth/react";
+import {
+  getSession,
+  signOut,
+} from "next-auth/react";
 
 export default function LoginPage() {
   useEffect(() => {
     (async () => {
       const session = await getSession();
       if (session) {
-        signOut();
+        await signOut({ redirect: false });
       }
     })();
   }, []);

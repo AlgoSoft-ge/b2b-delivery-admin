@@ -1338,18 +1338,13 @@ const OrderTable: React.FC<{
           />
         </SortableContext>
       </DndContext>
-      <Button
-        type="primary"
-        style={{
-          position: "fixed",
-          left: "10px",
-          bottom: "10px",
-          backgroundColor: "",
-        }}
+      <button
+        className="fixed left-3 bottom-3 gap-x-1.5 tracking-wide  rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         onClick={() => setIsDrawer(true)}
       >
         ანალიტიკა
-      </Button>
+      </button>
+
       <TableContext.Provider
         value={{
           orders,

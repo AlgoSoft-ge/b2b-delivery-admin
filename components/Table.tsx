@@ -26,6 +26,7 @@ import {
   getUniques,
   getDefaultFilter,
   getColorForStatus,
+  cn,
 } from "@/lib/utils";
 import {
   createCache,
@@ -1209,7 +1210,10 @@ const OrderTable: React.FC<{
               y: "100% - 200px",
               x: 750,
             }}
-            className="custom-scroll"
+            className={cn(
+              "custom-scroll",
+              orders.length > 0 ? "" : "scroll"
+            )}
             components={{
               body: {
                 row: Row,

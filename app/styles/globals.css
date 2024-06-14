@@ -14,24 +14,28 @@ select {
   padding: 0 10px;
 }
 
-.custom-scroll::-webkit-scrollbar {
+.custom-scroll::-webkit-scrollbar,
+.ant-table-header::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 /* Track */
-.custom-scroll::-webkit-scrollbar-track {
+.custom-scroll::-webkit-scrollbar-track,
+.ant-table-header::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 20%;
 }
 
 /* Handle */
-.custom-scroll::-webkit-scrollbar-thumb {
+.custom-scroll::-webkit-scrollbar-thumb,
+.ant-table-header::-webkit-scrollbar-thumb {
   background: #888;
 }
 
 /* Handle on hover */
-.custom-scroll::-webkit-scrollbar-thumb:hover {
+.custom-scroll::-webkit-scrollbar-thumb:hover,
+.ant-table-header::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
@@ -95,4 +99,7 @@ select {
 
 .ant-drawer-mask {
   display: none;
+}
+.scroll .ant-table-header {
+  overflow: auto !important;
 }

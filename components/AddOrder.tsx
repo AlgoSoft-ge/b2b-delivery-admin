@@ -135,7 +135,10 @@ export default function AddOrder({
         />
       )}
       {type == "excel" && (
-        <ExcelForm token={user?.token} />
+        <ExcelForm
+          token={user?.token}
+          setIsAdd={setIsAdd}
+        />
       )}
       {/* {type == "barcode" && (
         <Scanner setBarcode={setBarcode} setType={setType} />
